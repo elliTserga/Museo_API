@@ -1,0 +1,52 @@
+﻿CREATE TABLE Categories (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Exhibits (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Title NVARCHAR(150) NOT NULL,
+    Description NVARCHAR(MAX) NULL,
+    Year INT NOT NULL,
+    ImageUrl NVARCHAR(300) NULL,
+    CategoryId INT NOT NULL,
+    CONSTRAINT FK_Exhibits_Categories
+        FOREIGN KEY (CategoryId)
+        REFERENCES Categories(Id)
+);
+
+CREATE TABLE Museums (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(150) NOT NULL,
+    Description NVARCHAR(MAX),
+    Location NVARCHAR(200),
+    OpeningHours NVARCHAR(100),
+    Phone NVARCHAR(50),
+    Email NVARCHAR(100),
+    Website NVARCHAR(200)
+);
+
+CREATE TABLE Announcements (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Title NVARCHAR(150) NOT NULL,
+    Content NVARCHAR(MAX) NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
+);
+
+CREATE TABLE Users (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(300) NOT NULL,
+    Role NVARCHAR(50) NOT NULL
+);
+
+CREATE TABLE MediaItems (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ExhibitId INT NOT NULL,
+    FileName NVARCHAR(150) NOT NULL,
+    FileType NVARCHAR(50) NOT NULL,
+    Url NVARCHAR(300) NOT NULL,
+    CONSTRAINT FK_MediaItems_Exhibits
+        FOREIGN KEY (ExhibitId)
+        REFERENCES Exhibits(Id)
+);
