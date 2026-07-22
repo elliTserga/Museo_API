@@ -23,4 +23,16 @@ public class MuseumRepository
             "sp_GetMuseum",
             commandType: CommandType.StoredProcedure);
     }
+
+    public async Task<bool> UpdateAsync(UpdateMuseumDto dto)
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        int rowsAffected = await connection.ExecuteScalarAsync<int>(
+            "sp_UpdateMuseum",
+            dto,
+            commandType: CommandType.StoredProcedure);
+
+        return rowsAffected > 0;
+    }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MuseoShared.DTOs;
 using MuseoData.Repositories;
+using MuseoShared.DTOs;
 
 namespace MuseoAPI.Controllers;
 
@@ -17,37 +17,198 @@ public class AnnouncementsController : ControllerBase
     }
 
     [HttpGet]
+    public async Task<IActionResult> GetVisible()
+    {
+        try
+        {
+            var announcements = await _announcementRepository.GetVisibleAsync();
+
+            return Ok(announcements);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while retrieving announcements."
+            });
+        }
+    }
+
+    [Authorize]
+    [HttpGet("all")]
     public async Task<IActionResult> GetAll()
     {
-        var announcements = await _announcementRepository.GetAllAsync();
+        try
+        {
+            var announcements = await _announcementRepository.GetAllAsync();
 
-        return Ok(announcements);
+            return Ok(announcements);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while retrieving announcements."
+            });
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        try
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "The announcement id must be greater than zero."
+                });
+            }
+
+            var announcement = await _announcementRepository.GetByIdAsync(id);
+
+            if (announcement == null)
+            {
+                return NotFound(new
+                {
+                    message = "Announcement not found."
+                });
+            }
+
+            return Ok(announcement);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while retrieving the announcement."
+            });
+        }
     }
 
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CreateAnnouncementDto dto)
     {
-        int newId = await _announcementRepository.CreateAsync(dto);
-
-        return Created($"/api/announcements/{newId}", new
+        try
         {
-            Id = newId,
-            Message = "Announcement created successfully"
-        });
+            if (string.IsNullOrWhiteSpace(dto.Title))
+            {
+                return BadRequest(new
+                {
+                    message = "Title is required."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Content))
+            {
+                return BadRequest(new
+                {
+                    message = "Content is required."
+                });
+            }
+
+            int newId = await _announcementRepository.CreateAsync(dto);
+
+            return Created($"/api/announcements/{newId}", new
+            {
+                id = newId,
+                message = "Announcement created successfully."
+            });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while creating the announcement."
+            });
+        }
+    }
+
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, UpdateAnnouncementDto dto)
+    {
+        try
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "The announcement id must be greater than zero."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Title))
+            {
+                return BadRequest(new
+                {
+                    message = "Title is required."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Content))
+            {
+                return BadRequest(new
+                {
+                    message = "Content is required."
+                });
+            }
+
+            bool updated = await _announcementRepository.UpdateAsync(id, dto);
+
+            if (!updated)
+            {
+                return NotFound(new
+                {
+                    message = "Announcement not found."
+                });
+            }
+
+            return NoContent();
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while updating the announcement."
+            });
+        }
     }
 
     [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        bool deleted = await _announcementRepository.DeleteAsync(id);
-
-        if (!deleted)
+        try
         {
-            return NotFound();
-        }
+            if (id <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "The announcement id must be greater than zero."
+                });
+            }
 
-        return NoContent();
+            bool deleted = await _announcementRepository.DeleteAsync(id);
+
+            if (!deleted)
+            {
+                return NotFound(new
+                {
+                    message = "Announcement not found."
+                });
+            }
+
+            return NoContent();
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while deleting the announcement."
+            });
+        }
     }
 }

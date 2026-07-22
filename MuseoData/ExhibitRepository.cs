@@ -48,7 +48,7 @@ public class ExhibitRepository
     {
         using var connection = _dbConnectionFactory.CreateConnection();
 
-        int rowsAffected = await connection.ExecuteAsync(
+        int rowsAffected = await connection.ExecuteScalarAsync<int>(
             "sp_UpdateExhibit",
             new
             {
@@ -68,11 +68,52 @@ public class ExhibitRepository
     {
         using var connection = _dbConnectionFactory.CreateConnection();
 
-        int rowsAffected = await connection.ExecuteAsync(
+        int rowsAffected = await connection.ExecuteScalarAsync<int>(
             "sp_DeleteExhibit",
             new { Id = id },
             commandType: CommandType.StoredProcedure);
 
         return rowsAffected > 0;
+    }
+
+    public async Task<IEnumerable<Exhibit>> GetByCategoryIdAsync(int categoryId)
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        return await connection.QueryAsync<Exhibit>(
+            "sp_GetExhibitsByCategoryId",
+            new { CategoryId = categoryId },
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public async Task<ExhibitDetailsDto?> GetDetailsByIdAsync(int id)
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        var exhibit = await connection.QueryFirstOrDefaultAsync<Exhibit>(
+            "sp_GetExhibitById",
+            new { Id = id },
+            commandType: CommandType.StoredProcedure);
+
+        if (exhibit == null)
+        {
+            return null;
+        }
+
+        var media = await connection.QueryAsync<MediaItem>(
+            "sp_GetMediaByExhibitId",
+            new { ExhibitId = id },
+            commandType: CommandType.StoredProcedure);
+
+        return new ExhibitDetailsDto
+        {
+            Id = exhibit.Id,
+            Title = exhibit.Title,
+            Description = exhibit.Description,
+            Year = exhibit.Year,
+            CategoryId = exhibit.CategoryId,
+            ImageUrl = exhibit.ImageUrl,
+            Media = media.ToList()
+        };
     }
 }

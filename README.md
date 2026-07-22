@@ -89,12 +89,14 @@ The returned JWT token must be included as a Bearer Token when accessing protect
 ## Features
 
 - JWT Authentication
-- Password hashing using BCrypt
 - CRUD operations for Exhibits
-- Categories management
-- Museum information
-- Announcements
-- Media items
+- CRUD operations for Categories
+- CRUD operations for Announcements
+- CRUD operations for Media Items
+- Museum information management
+- Filter exhibits by category
+- Exhibits with associated media
+- Announcement visibility and scheduling
 - SQL Stored Procedures
 - Global exception handling
 
