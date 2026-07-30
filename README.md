@@ -4,7 +4,7 @@
 
 MuseoAPI is an ASP.NET Core Web API developed as part of my internship. The API provides the backend functionality for a museum management system, allowing clients to manage exhibits, categories, announcements, media items and museum information.
 
-The project uses JWT authentication for protected endpoints and stores data in Microsoft SQL Server.
+The project uses JWT authentication for protected endpoints, stores data in Microsoft SQL Server and supports media file uploads through MinIO object storage.
 
 ---
 
@@ -16,6 +16,8 @@ The project uses JWT authentication for protected endpoints and stores data in M
 - Microsoft SQL Server
 - JWT Authentication
 - BCrypt Password Hashing
+- MinIO Object Storage
+- Docker
 
 ---
 
@@ -23,11 +25,11 @@ The project uses JWT authentication for protected endpoints and stores data in M
 
 The solution is split into multiple projects:
 
-- **MuseoAPI** – Controllers, middleware and API configuration.
+- **MuseoAPI** – Controllers, middleware, request models and API configuration.
 - **MuseoData** – Data access layer (repositories).
-- **Adapter** – Database connection management.
+- **Adapter** – Database connection management and MinIO storage implementation.
 - **MuseoAuth** – Authentication, JWT generation and password hashing.
-- **MuseoShared** – Shared models and DTOs.
+- **MuseoShared** – Shared models, DTOs and interfaces.
 
 ---
 
@@ -59,6 +61,12 @@ Jwt__Key=...
 Jwt__Issuer=...
 Jwt__Audience=...
 JWT_EXPIRATION_HOURS=2
+
+Minio__Endpoint=localhost:9000
+Minio__AccessKey=minioadmin
+Minio__SecretKey=minioadmin
+Minio__BucketName=media
+Minio__UseSSL=false
 ```
 
 ---
@@ -86,17 +94,34 @@ The returned JWT token must be included as a Bearer Token when accessing protect
 
 ---
 
+## File Storage
+
+Media files are uploaded using `multipart/form-data`.
+
+The uploaded file is stored in MinIO object storage, while only its metadata (file name, content type, file size and storage path) is stored in the SQL Server database.
+
+Upload request:
+
+| Field | Type |
+|------|------|
+| ExhibitId | Text |
+| file | File |
+
+Before running the application, make sure the MinIO container is running and the configured bucket has been created.
+
+---
+
 ## Features
 
 - JWT Authentication
+- Password hashing using BCrypt
 - CRUD operations for Exhibits
-- CRUD operations for Categories
-- CRUD operations for Announcements
-- CRUD operations for Media Items
-- Museum information management
-- Filter exhibits by category
-- Exhibits with associated media
-- Announcement visibility and scheduling
+- Categories management
+- Museum information
+- Announcements
+- Media items
+- File upload using MinIO
+- Media metadata storage in SQL Server
 - SQL Stored Procedures
 - Global exception handling
 

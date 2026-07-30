@@ -5,6 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MuseoAuth;
 using Adapter;
+using Adapter.Settings;
+using Adapter.Storage;
+using MuseoShared.Interfaces;
 using DotNetEnv;
 
 Env.Load();
@@ -35,10 +38,12 @@ builder.Services.AddScoped<AuthenticationService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 builder.Services.AddSingleton<DbConnectionFactory>();
+
 builder.Services.AddScoped<ExhibitRepository>();
 builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped<MuseumRepository>();
@@ -46,6 +51,11 @@ builder.Services.AddScoped<AnnouncementRepository>();
 builder.Services.AddScoped<AuthRepository>();
 builder.Services.AddScoped<MediaRepository>();
 builder.Services.AddScoped<PasswordService>();
+
+builder.Services.Configure<MinioSettings>(
+    builder.Configuration.GetSection("Minio"));
+
+builder.Services.AddScoped<IStorageService, MinioStorageService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -59,6 +69,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
+
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
             )

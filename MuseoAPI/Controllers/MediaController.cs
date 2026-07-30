@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MuseoAPI.Requests;
 using MuseoData.Repositories;
 using MuseoShared.DTOs;
+using MuseoShared.Interfaces;
 
 namespace MuseoAPI.Controllers;
 
@@ -10,10 +12,14 @@ namespace MuseoAPI.Controllers;
 public class MediaController : ControllerBase
 {
     private readonly MediaRepository _mediaRepository;
+    private readonly IStorageService _storageService;
 
-    public MediaController(MediaRepository mediaRepository)
+    public MediaController(
+        MediaRepository mediaRepository,
+        IStorageService storageService)
     {
         _mediaRepository = mediaRepository;
+        _storageService = storageService;
     }
 
     [HttpGet]
@@ -97,11 +103,13 @@ public class MediaController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> Create(CreateMediaItemDto dto)
+    public async Task<IActionResult> Create(
+        [FromForm] CreateMediaItemRequest request,
+        CancellationToken cancellationToken)
     {
         try
         {
-            if (dto.ExhibitId <= 0)
+            if (request.ExhibitId <= 0)
             {
                 return BadRequest(new
                 {
@@ -109,43 +117,50 @@ public class MediaController : ControllerBase
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(dto.FileName))
+            if (request.File == null || request.File.Length == 0)
             {
                 return BadRequest(new
                 {
-                    message = "File name is required."
+                    message = "A file is required."
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(dto.FileType))
-            {
-                return BadRequest(new
-                {
-                    message = "File type is required."
-                });
-            }
+            string extension = Path.GetExtension(request.File.FileName);
 
-            if (string.IsNullOrWhiteSpace(dto.Url))
+            string path =
+                $"exhibits/{request.ExhibitId}/{Guid.NewGuid()}{extension}";
+
+            await using Stream stream = request.File.OpenReadStream();
+
+            await _storageService.UploadAsync(
+                path,
+                stream,
+                request.File.ContentType,
+                cancellationToken);
+
+            var dto = new CreateMediaItemDto
             {
-                return BadRequest(new
-                {
-                    message = "URL is required."
-                });
-            }
+                ExhibitId = request.ExhibitId,
+                FileName = request.File.FileName,
+                FileType = request.File.ContentType,
+                Url = path,
+                Size = request.File.Length
+            };
 
             int newId = await _mediaRepository.CreateAsync(dto);
 
             return Created($"/api/media/{newId}", new
             {
                 id = newId,
-                message = "Media item created successfully."
+                path,
+                message = "Media item uploaded successfully."
             });
         }
         catch (Exception)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while creating the media item."
+                message = "An error occurred while uploading the media item."
             });
         }
     }
@@ -233,13 +248,25 @@ public class MediaController : ControllerBase
                 });
             }
 
-            bool deleted = await _mediaRepository.DeleteAsync(id);
+            var mediaItem = await _mediaRepository.GetByIdAsync(id);
 
-            if (!deleted)
+            if (mediaItem == null)
             {
                 return NotFound(new
                 {
                     message = "Media item not found."
+                });
+            }
+
+            await _storageService.DeleteAsync(mediaItem.Url);
+
+            bool deleted = await _mediaRepository.DeleteAsync(id);
+
+            if (!deleted)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Failed to delete media item."
                 });
             }
 

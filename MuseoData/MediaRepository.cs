@@ -66,7 +66,8 @@ public class MediaRepository
                 dto.ExhibitId,
                 dto.FileName,
                 dto.FileType,
-                dto.Url
+                dto.Url,
+                dto.Size
             },
             commandType: CommandType.StoredProcedure);
 
