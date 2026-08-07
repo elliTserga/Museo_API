@@ -27,15 +27,23 @@ public class MediaController : ControllerBase
     {
         try
         {
-            var mediaItems = await _mediaRepository.GetAllAsync();
+            var mediaItems =
+                (await _mediaRepository.GetAllAsync()).ToList();
+
+            foreach (var mediaItem in mediaItems)
+            {
+                mediaItem.Url =
+                    await _storageService.GetFileUrlAsync(mediaItem.Url);
+            }
 
             return Ok(mediaItems);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving media items."
+                message =
+                    "An error occurred while retrieving media items. " + ex
             });
         }
     }
@@ -49,7 +57,8 @@ public class MediaController : ControllerBase
             {
                 return BadRequest(new
                 {
-                    message = "The media item id must be greater than zero."
+                    message =
+                        "The media item id must be greater than zero."
                 });
             }
 
@@ -63,13 +72,17 @@ public class MediaController : ControllerBase
                 });
             }
 
+            mediaItem.Url =
+                await _storageService.GetFileUrlAsync(mediaItem.Url);
+
             return Ok(mediaItem);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving the media item."
+                message =
+                    "An error occurred while retrieving the media item. " + ex
             });
         }
     }
@@ -83,20 +96,31 @@ public class MediaController : ControllerBase
             {
                 return BadRequest(new
                 {
-                    message = "The exhibit id must be greater than zero."
+                    message =
+                        "The exhibit id must be greater than zero."
                 });
             }
 
             var mediaItems =
-                await _mediaRepository.GetByExhibitIdAsync(exhibitId);
+                (await _mediaRepository
+                    .GetByExhibitIdAsync(exhibitId))
+                .ToList();
+
+            foreach (var mediaItem in mediaItems)
+            {
+                mediaItem.Url =
+                    await _storageService.GetFileUrlAsync(mediaItem.Url);
+            }
 
             return Ok(mediaItems);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving media items for the exhibit."
+                message =
+                    "An error occurred while retrieving media items for the exhibit. "
+                    + ex
             });
         }
     }
@@ -125,12 +149,15 @@ public class MediaController : ControllerBase
                 });
             }
 
-            string extension = Path.GetExtension(request.File.FileName);
+            string extension =
+                Path.GetExtension(request.File.FileName);
 
             string path =
-                $"exhibits/{request.ExhibitId}/{Guid.NewGuid()}{extension}";
+                $"exhibits/{request.ExhibitId}/" +
+                $"{Guid.NewGuid()}{extension}";
 
-            await using Stream stream = request.File.OpenReadStream();
+            await using Stream stream =
+                request.File.OpenReadStream();
 
             await _storageService.UploadAsync(
                 path,
@@ -147,20 +174,26 @@ public class MediaController : ControllerBase
                 Size = request.File.Length
             };
 
-            int newId = await _mediaRepository.CreateAsync(dto);
+            int newId =
+                await _mediaRepository.CreateAsync(dto);
+
+            string fileUrl =
+                await _storageService.GetFileUrlAsync(path);
 
             return Created($"/api/media/{newId}", new
             {
                 id = newId,
-                path,
+                url = fileUrl,
                 message = "Media item uploaded successfully."
             });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while uploading the media item."
+                message =
+                    "An error occurred while uploading the media item. "
+                    + ex
             });
         }
     }
@@ -177,7 +210,8 @@ public class MediaController : ControllerBase
             {
                 return BadRequest(new
                 {
-                    message = "The media item id must be greater than zero."
+                    message =
+                        "The media item id must be greater than zero."
                 });
             }
 
@@ -213,7 +247,8 @@ public class MediaController : ControllerBase
                 });
             }
 
-            bool updated = await _mediaRepository.UpdateAsync(id, dto);
+            bool updated =
+                await _mediaRepository.UpdateAsync(id, dto);
 
             if (!updated)
             {
@@ -225,11 +260,13 @@ public class MediaController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while updating the media item."
+                message =
+                    "An error occurred while updating the media item. "
+                    + ex
             });
         }
     }
@@ -244,11 +281,13 @@ public class MediaController : ControllerBase
             {
                 return BadRequest(new
                 {
-                    message = "The media item id must be greater than zero."
+                    message =
+                        "The media item id must be greater than zero."
                 });
             }
 
-            var mediaItem = await _mediaRepository.GetByIdAsync(id);
+            var mediaItem =
+                await _mediaRepository.GetByIdAsync(id);
 
             if (mediaItem == null)
             {
@@ -260,7 +299,8 @@ public class MediaController : ControllerBase
 
             await _storageService.DeleteAsync(mediaItem.Url);
 
-            bool deleted = await _mediaRepository.DeleteAsync(id);
+            bool deleted =
+                await _mediaRepository.DeleteAsync(id);
 
             if (!deleted)
             {
@@ -272,11 +312,13 @@ public class MediaController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while deleting the media item."
+                message =
+                    "An error occurred while deleting the media item. "
+                    + ex
             });
         }
     }

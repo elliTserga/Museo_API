@@ -40,7 +40,7 @@ The `Database` folder contains everything required to recreate the database:
 - `01_CreateTables.sql`
 - `02_SeedData.sql`
 - `03_CreateStoredProcedures.sql`
-- `MuseoDb_Schema.sql`
+- `script_new.sql`
 
 A full database backup (`MuseoDb.bak`) can also be used to restore the complete database including data.
 
@@ -63,8 +63,8 @@ Jwt__Audience=...
 JWT_EXPIRATION_HOURS=2
 
 Minio__Endpoint=localhost:9000
-Minio__AccessKey=minioadmin
-Minio__SecretKey=minioadmin
+Minio__AccessKey=admin
+Minio__SecretKey=admin1234
 Minio__BucketName=media
 Minio__UseSSL=false
 ```
@@ -91,6 +91,30 @@ Example request:
 ```
 
 The returned JWT token must be included as a Bearer Token when accessing protected endpoints.
+
+---
+
+## Running MinIO
+
+The project uses Docker Compose to start MinIO.
+
+From the solution root directory run:
+
+```bash
+docker compose up -d
+```
+
+This command automatically:
+
+- Creates the MinIO container
+- Creates the required Docker volume
+- Starts the MinIO service
+
+To stop the container:
+
+```bash
+docker compose down
+```
 
 ---
 

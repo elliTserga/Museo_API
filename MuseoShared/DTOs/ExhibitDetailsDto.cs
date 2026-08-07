@@ -12,7 +12,8 @@ public class ExhibitDetailsDto
 
     public int Year { get; set; }
 
-    public int CategoryId { get; set; }
+    public int? CategoryId { get; set; }
+    public bool Visible { get; set; }
 
     public string ImageUrl { get; set; } = string.Empty;
 

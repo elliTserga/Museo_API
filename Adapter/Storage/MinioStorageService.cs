@@ -54,5 +54,16 @@ namespace Adapter.Storage
                 removeObjectArgs,
                 cancellationToken);
         }
+
+        public async Task<string> GetFileUrlAsync(string path)
+        {
+            var presignedArgs = new PresignedGetObjectArgs()
+                .WithBucket(_settings.BucketName)
+                .WithObject(path)
+                .WithExpiry(60 * 60);
+
+            return await _minioClient.PresignedGetObjectAsync(
+                presignedArgs);
+        }
     }
 }

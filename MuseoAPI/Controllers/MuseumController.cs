@@ -33,11 +33,11 @@ public class MuseumController : ControllerBase
 
             return Ok(museum);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving the museum."
+                message = "An error occurred while retrieving the museum." + ex
             });
         }
     }
@@ -84,11 +84,11 @@ public class MuseumController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while updating the museum."
+                message = "An error occurred while updating the museum." + ex
             });
         }
     }

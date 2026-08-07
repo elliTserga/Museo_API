@@ -25,11 +25,11 @@ public class AnnouncementsController : ControllerBase
 
             return Ok(announcements);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving announcements."
+                message = "An error occurred while retrieving announcements. " + ex
             });
         }
     }
@@ -44,11 +44,11 @@ public class AnnouncementsController : ControllerBase
 
             return Ok(announcements);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving announcements."
+                message = "An error occurred while retrieving announcements. " + ex
             });
         }
     }
@@ -78,11 +78,11 @@ public class AnnouncementsController : ControllerBase
 
             return Ok(announcement);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving the announcement."
+                message = "An error occurred while retrieving the announcement. " +ex
             });
         }
     }
@@ -117,11 +117,11 @@ public class AnnouncementsController : ControllerBase
                 message = "Announcement created successfully."
             });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while creating the announcement."
+                message = "An error occurred while creating the announcement. " + ex
             });
         }
     }
@@ -168,11 +168,11 @@ public class AnnouncementsController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while updating the announcement."
+                message = "An error occurred while updating the announcement. " +ex
             });
         }
     }
@@ -203,11 +203,11 @@ public class AnnouncementsController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while deleting the announcement."
+                message = "An error occurred while deleting the announcement. " +ex
             });
         }
     }

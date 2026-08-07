@@ -13,5 +13,7 @@
             string path,
             CancellationToken cancellationToken = default
         );
+
+        Task<string> GetFileUrlAsync(string path);
     }
 }

@@ -10,7 +10,7 @@ using Adapter.Storage;
 using MuseoShared.Interfaces;
 using DotNetEnv;
 
-Env.Load();
+Env.Load(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".env"));
 
 var builder = WebApplication.CreateBuilder(args);
 

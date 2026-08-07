@@ -25,11 +25,12 @@ public class CategoriesController : ControllerBase
 
             return Ok(categories);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving categories."
+                message = "An error occurred while retrieving categories.",
+                error = ex.Message
             });
         }
     }
@@ -59,11 +60,12 @@ public class CategoriesController : ControllerBase
 
             return Ok(category);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving the category."
+                message = "An error occurred while retrieving the category.",
+                error = ex.Message
             });
         }
     }
@@ -90,18 +92,21 @@ public class CategoriesController : ControllerBase
                 message = "Category created successfully."
             });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while creating the category."
+                message = "An error occurred while creating the category.",
+                error = ex.Message
             });
         }
     }
 
     [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateCategoryDto dto)
+    public async Task<IActionResult> Update(
+        int id,
+        UpdateCategoryDto dto)
     {
         try
         {
@@ -133,18 +138,21 @@ public class CategoriesController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while updating the category."
+                message = "An error occurred while updating the category.",
+                error = ex.Message
             });
         }
     }
 
     [Authorize]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(
+        int id,
+        [FromQuery] bool force = false)
     {
         try
         {
@@ -156,9 +164,9 @@ public class CategoriesController : ControllerBase
                 });
             }
 
-            bool deleted = await _categoryRepository.DeleteAsync(id);
+            int result = await _categoryRepository.DeleteAsync(id, force);
 
-            if (!deleted)
+            if (result == -2)
             {
                 return NotFound(new
                 {
@@ -166,13 +174,26 @@ public class CategoriesController : ControllerBase
                 });
             }
 
+            if (result == -1)
+            {
+                return Conflict(new
+                {
+                    message = "This category contains exhibits. Confirm the deletion to continue.",
+                    warning = "If the category is deleted, the associated exhibits will remain without a category.",
+                    requiresConfirmation = true,
+                    confirmationRequest =
+                        $"/api/categories/{id}?force=true"
+                });
+            }
+
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while deleting the category."
+                message = "An error occurred while deleting the category.",
+                error = ex.Message
             });
         }
     }

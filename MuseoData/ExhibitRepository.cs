@@ -15,12 +15,23 @@ public class ExhibitRepository
         _dbConnectionFactory = dbConnectionFactory;
     }
 
+    // Public GET: returns only visible exhibits
     public async Task<IEnumerable<Exhibit>> GetAllAsync()
     {
         using var connection = _dbConnectionFactory.CreateConnection();
 
         return await connection.QueryAsync<Exhibit>(
             "sp_GetAllExhibits",
+            commandType: CommandType.StoredProcedure);
+    }
+
+    // Admin GET: returns all exhibits
+    public async Task<IEnumerable<Exhibit>> GetAllForAdminAsync()
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        return await connection.QueryAsync<Exhibit>(
+            "sp_GetAllExhibitsForAdmin",
             commandType: CommandType.StoredProcedure);
     }
 
@@ -57,7 +68,8 @@ public class ExhibitRepository
                 dto.Description,
                 dto.Year,
                 dto.ImageUrl,
-                dto.CategoryId
+                dto.CategoryId,
+                dto.Visible
             },
             commandType: CommandType.StoredProcedure);
 
@@ -113,6 +125,7 @@ public class ExhibitRepository
             Year = exhibit.Year,
             CategoryId = exhibit.CategoryId,
             ImageUrl = exhibit.ImageUrl,
+            Visible = exhibit.Visible,
             Media = media.ToList()
         };
     }

@@ -60,15 +60,17 @@ public class CategoryRepository
         return rowsAffected > 0;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<int> DeleteAsync(int id, bool force)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
 
-        int rowsAffected = await connection.ExecuteScalarAsync<int>(
+        return await connection.ExecuteScalarAsync<int>(
             "sp_DeleteCategory",
-            new { Id = id },
+            new
+            {
+                Id = id,
+                Force = force
+            },
             commandType: CommandType.StoredProcedure);
-
-        return rowsAffected > 0;
     }
 }

@@ -16,6 +16,7 @@ public class ExhibitsController : ControllerBase
         _exhibitRepository = exhibitRepository;
     }
 
+    // Public endpoint - returns only visible exhibits
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -25,11 +26,31 @@ public class ExhibitsController : ControllerBase
 
             return Ok(exhibits);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving exhibits."
+                message = "An error occurred while retrieving exhibits. " + ex
+            });
+        }
+    }
+
+    // Admin endpoint - returns all exhibits
+    [Authorize]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllForAdmin()
+    {
+        try
+        {
+            var exhibits = await _exhibitRepository.GetAllForAdminAsync();
+
+            return Ok(exhibits);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while retrieving all exhibits. " + ex
             });
         }
     }
@@ -59,11 +80,11 @@ public class ExhibitsController : ControllerBase
 
             return Ok(exhibit);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving the exhibit."
+                message = "An error occurred while retrieving the exhibit. " + ex
             });
         }
     }
@@ -86,11 +107,11 @@ public class ExhibitsController : ControllerBase
 
             return Ok(exhibits);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while retrieving exhibits by category."
+                message = "An error occurred while retrieving exhibits by category. " + ex
             });
         }
     }
@@ -125,11 +146,11 @@ public class ExhibitsController : ControllerBase
                 message = "Exhibit created successfully."
             });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while creating the exhibit."
+                message = "An error occurred while creating the exhibit. " + ex
             });
         }
     }
@@ -179,11 +200,11 @@ public class ExhibitsController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while updating the exhibit."
+                message = "An error occurred while updating the exhibit. " + ex
             });
         }
     }
@@ -215,11 +236,11 @@ public class ExhibitsController : ControllerBase
 
             return NoContent();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(500, new
             {
-                message = "An error occurred while deleting the exhibit."
+                message = "An error occurred while deleting the exhibit. " + ex
             });
         }
     }
