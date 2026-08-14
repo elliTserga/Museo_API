@@ -62,7 +62,8 @@ public class MediaController : ControllerBase
                 });
             }
 
-            var mediaItem = await _mediaRepository.GetByIdAsync(id);
+            var mediaItem =
+                await _mediaRepository.GetByIdAsync(id);
 
             if (mediaItem == null)
             {
@@ -125,6 +126,54 @@ public class MediaController : ControllerBase
         }
     }
 
+    // Returns the actual stored file.
+    // Images can be previewed directly in Postman.
+    [HttpGet("{id}/file")]
+    public async Task<IActionResult> GetFile(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new
+                {
+                    message =
+                        "The media item id must be greater than zero."
+                });
+            }
+
+            var mediaItem =
+                await _mediaRepository.GetByIdAsync(id);
+
+            if (mediaItem == null)
+            {
+                return NotFound(new
+                {
+                    message = "Media item not found."
+                });
+            }
+
+            var stream =
+                await _storageService.GetFileAsync(
+                    mediaItem.Url,
+                    cancellationToken);
+
+            return File(
+                stream,
+                mediaItem.FileType);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message =
+                    "An error occurred while retrieving the media file. " + ex
+            });
+        }
+    }
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(
@@ -141,11 +190,33 @@ public class MediaController : ControllerBase
                 });
             }
 
-            if (request.File == null || request.File.Length == 0)
+            if (request.File == null ||
+                request.File.Length == 0)
             {
                 return BadRequest(new
                 {
                     message = "A file is required."
+                });
+            }
+
+            string contentType =
+                request.File.ContentType.ToLowerInvariant();
+
+            bool isImage =
+                contentType.StartsWith("image/");
+
+            bool isVideo =
+                contentType.StartsWith("video/");
+
+            bool isAudio =
+                contentType.StartsWith("audio/");
+
+            if (!isImage && !isVideo && !isAudio)
+            {
+                return BadRequest(new
+                {
+                    message =
+                        "Only image, video and audio files are allowed."
                 });
             }
 
@@ -184,7 +255,12 @@ public class MediaController : ControllerBase
             {
                 id = newId,
                 url = fileUrl,
-                message = "Media item uploaded successfully."
+                mediaType =
+                    isImage ? "image" :
+                    isVideo ? "video" :
+                    "audio",
+                message =
+                    "Media item uploaded successfully."
             });
         }
         catch (Exception ex)
@@ -219,7 +295,8 @@ public class MediaController : ControllerBase
             {
                 return BadRequest(new
                 {
-                    message = "A valid exhibit id is required."
+                    message =
+                        "A valid exhibit id is required."
                 });
             }
 
@@ -297,7 +374,8 @@ public class MediaController : ControllerBase
                 });
             }
 
-            await _storageService.DeleteAsync(mediaItem.Url);
+            await _storageService.DeleteAsync(
+                mediaItem.Url);
 
             bool deleted =
                 await _mediaRepository.DeleteAsync(id);

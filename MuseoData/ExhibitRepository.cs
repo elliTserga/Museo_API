@@ -15,20 +15,20 @@ public class ExhibitRepository
         _dbConnectionFactory = dbConnectionFactory;
     }
 
-    // Public GET: returns only visible exhibits
     public async Task<IEnumerable<Exhibit>> GetAllAsync()
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
         return await connection.QueryAsync<Exhibit>(
             "sp_GetAllExhibits",
             commandType: CommandType.StoredProcedure);
     }
 
-    // Admin GET: returns all exhibits
     public async Task<IEnumerable<Exhibit>> GetAllForAdminAsync()
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
         return await connection.QueryAsync<Exhibit>(
             "sp_GetAllExhibitsForAdmin",
@@ -37,7 +37,8 @@ public class ExhibitRepository
 
     public async Task<Exhibit?> GetByIdAsync(int id)
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
         return await connection.QueryFirstOrDefaultAsync<Exhibit>(
             "sp_GetExhibitById",
@@ -47,7 +48,8 @@ public class ExhibitRepository
 
     public async Task<int> CreateAsync(CreateExhibitDto dto)
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
         return await connection.ExecuteScalarAsync<int>(
             "sp_CreateExhibit",
@@ -55,67 +57,85 @@ public class ExhibitRepository
             commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<bool> UpdateAsync(int id, UpdateExhibitDto dto)
+    public async Task<bool> UpdateAsync(
+        int id,
+        UpdateExhibitDto dto)
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
-        int rowsAffected = await connection.ExecuteScalarAsync<int>(
-            "sp_UpdateExhibit",
-            new
-            {
-                Id = id,
-                dto.Title,
-                dto.Description,
-                dto.Year,
-                dto.ImageUrl,
-                dto.CategoryId,
-                dto.Visible
-            },
-            commandType: CommandType.StoredProcedure);
+        int rowsAffected =
+            await connection.ExecuteScalarAsync<int>(
+                "sp_UpdateExhibit",
+                new
+                {
+                    Id = id,
+                    dto.Title,
+                    dto.Description,
+                    dto.Year,
+                    dto.CategoryId,
+                    dto.ImagePath,
+                    dto.Visible
+                },
+                commandType: CommandType.StoredProcedure);
 
         return rowsAffected > 0;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
-        int rowsAffected = await connection.ExecuteScalarAsync<int>(
-            "sp_DeleteExhibit",
-            new { Id = id },
-            commandType: CommandType.StoredProcedure);
+        int rowsAffected =
+            await connection.ExecuteScalarAsync<int>(
+                "sp_DeleteExhibit",
+                new { Id = id },
+                commandType: CommandType.StoredProcedure);
 
         return rowsAffected > 0;
     }
 
-    public async Task<IEnumerable<Exhibit>> GetByCategoryIdAsync(int categoryId)
+    public async Task<IEnumerable<Exhibit>>
+        GetByCategoryIdAsync(int categoryId)
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
         return await connection.QueryAsync<Exhibit>(
             "sp_GetExhibitsByCategoryId",
-            new { CategoryId = categoryId },
+            new
+            {
+                CategoryId = categoryId
+            },
             commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<ExhibitDetailsDto?> GetDetailsByIdAsync(int id)
+    public async Task<ExhibitDetailsDto?>
+        GetDetailsByIdAsync(int id)
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
-        var exhibit = await connection.QueryFirstOrDefaultAsync<Exhibit>(
-            "sp_GetExhibitById",
-            new { Id = id },
-            commandType: CommandType.StoredProcedure);
+        var exhibit =
+            await connection.QueryFirstOrDefaultAsync<Exhibit>(
+                "sp_GetExhibitById",
+                new { Id = id },
+                commandType: CommandType.StoredProcedure);
 
         if (exhibit == null)
         {
             return null;
         }
 
-        var media = await connection.QueryAsync<MediaItem>(
-            "sp_GetMediaByExhibitId",
-            new { ExhibitId = id },
-            commandType: CommandType.StoredProcedure);
+        var media =
+            await connection.QueryAsync<MediaItem>(
+                "sp_GetMediaByExhibitId",
+                new
+                {
+                    ExhibitId = id
+                },
+                commandType: CommandType.StoredProcedure);
 
         return new ExhibitDetailsDto
         {
@@ -124,8 +144,8 @@ public class ExhibitRepository
             Description = exhibit.Description,
             Year = exhibit.Year,
             CategoryId = exhibit.CategoryId,
-            ImageUrl = exhibit.ImageUrl,
             Visible = exhibit.Visible,
+            ImagePath = exhibit.ImagePath,
             Media = media.ToList()
         };
     }

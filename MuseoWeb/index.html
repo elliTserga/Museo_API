@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Museo</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- LOGIN -->
+    <section id="loginSection" class="login-container">
+
+        <h1>Museo</h1>
+        <h2>Login</h2>
+
+        <form id="loginForm">
+
+            <label for="username">Username</label>
+            <input type="text"
+                   id="username"
+                   placeholder="Enter username"
+                   required>
+
+            <label for="password">Password</label>
+            <input type="password"
+                   id="password"
+                   placeholder="Enter password"
+                   required>
+
+            <button type="submit">
+                Login
+            </button>
+
+        </form>
+
+        <p id="message"></p>
+
+    </section>
+
+
+    <!-- CATEGORIES -->
+    <section id="categoriesSection" class="hidden page-section">
+
+        <div class="top-actions">
+            <h1>Categories</h1>
+
+            <button id="addCategoryButton">
+                Add Category
+            </button>
+        </div>
+
+        <div id="categoriesContainer"></div>
+
+    </section>
+
+
+    <!-- CREATE CATEGORY -->
+    <section id="createCategorySection" class="hidden page-section">
+
+        <button id="backFromCategoryCreateButton">
+            Back to Categories
+        </button>
+
+        <h1>Create Category</h1>
+
+        <form id="createCategoryForm" class="form-card">
+
+            <label for="createCategoryName">
+                Category Name
+            </label>
+
+            <input type="text"
+                   id="createCategoryName"
+                   required>
+
+
+            <label for="createCategoryImage">
+                Category Image
+            </label>
+
+            <input type="file"
+                   id="createCategoryImage"
+                   accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/tiff">
+
+
+            <button type="submit" class="save-button">
+                Create Category
+            </button>
+
+        </form>
+
+        <p id="createCategoryMessage"></p>
+
+    </section>
+
+
+    <!-- EDIT CATEGORY -->
+    <section id="editCategorySection" class="hidden page-section">
+
+        <button id="backFromCategoryEditButton">
+            Back to Categories
+        </button>
+
+        <h1>Edit Category</h1>
+
+        <form id="editCategoryForm" class="form-card">
+
+            <label for="editCategoryName">
+                Category Name
+            </label>
+
+            <input type="text"
+                   id="editCategoryName"
+                   required>
+
+
+            <label for="editCategoryImage">
+                Change Category Image
+            </label>
+
+            <input type="file"
+                   id="editCategoryImage"
+                   accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/tiff">
+
+
+            <button type="submit" class="save-button">
+                Save Changes
+            </button>
+
+            <button type="button"
+                    id="deleteCategoryButton"
+                    class="delete-button">
+                Delete Category
+            </button>
+
+        </form>
+
+        <p id="editCategoryMessage"></p>
+
+    </section>
+
+
+    <!-- EXHIBITS -->
+    <section id="exhibitsSection" class="hidden page-section">
+
+        <div class="top-actions">
+
+            <button id="backToCategoriesButton">
+                Back to Categories
+            </button>
+
+            <button id="addExhibitButton">
+                Add Exhibit
+            </button>
+
+        </div>
+
+        <h1 id="selectedCategoryTitle">
+            Exhibits
+        </h1>
+
+        <div id="exhibitsContainer"></div>
+
+    </section>
+
+
+    <!-- CREATE EXHIBIT -->
+    <section id="createExhibitSection" class="hidden page-section">
+
+        <button id="backFromCreateButton">
+            Back to Exhibits
+        </button>
+
+        <h1>Create Exhibit</h1>
+
+        <form id="createExhibitForm" class="form-card">
+
+            <label for="exhibitTitle">
+                Title
+            </label>
+
+            <input type="text"
+                   id="exhibitTitle"
+                   required>
+
+
+            <label for="exhibitDescription">
+                Description
+            </label>
+
+            <textarea id="exhibitDescription"
+                      rows="5"></textarea>
+
+
+            <label for="exhibitYear">
+                Year
+            </label>
+
+            <input type="number"
+                   id="exhibitYear"
+                   required>
+
+
+            <label for="exhibitCoverImage">
+                Cover Image
+            </label>
+
+            <input type="file"
+                   id="exhibitCoverImage"
+                   accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/tiff">
+
+
+            <label for="exhibitMedia">
+                Upload Media
+            </label>
+
+            <input type="file"
+                   id="exhibitMedia"
+                   accept="image/*,video/*,audio/*"
+                   multiple>
+
+
+            <label class="checkbox-label">
+
+                <input type="checkbox"
+                       id="exhibitVisible"
+                       checked>
+
+                Visible
+
+            </label>
+
+
+            <button type="submit" class="save-button">
+                Create Exhibit
+            </button>
+
+        </form>
+
+        <p id="createExhibitMessage"></p>
+
+    </section>
+
+
+    <!-- EDIT EXHIBIT -->
+    <section id="editExhibitSection" class="hidden page-section">
+
+        <button id="backFromEditButton">
+            Back to Exhibits
+        </button>
+
+        <h1>Edit Exhibit</h1>
+
+        <form id="editExhibitForm" class="form-card">
+
+            <label for="editExhibitTitle">
+                Title
+            </label>
+
+            <input type="text"
+                   id="editExhibitTitle"
+                   required>
+
+
+            <label for="editExhibitDescription">
+                Description
+            </label>
+
+            <textarea id="editExhibitDescription"
+                      rows="5"></textarea>
+
+
+            <label for="editExhibitYear">
+                Year
+            </label>
+
+            <input type="number"
+                   id="editExhibitYear"
+                   required>
+
+
+            <label for="editExhibitCoverImage">
+                Change Cover Image
+            </label>
+
+            <input type="file"
+                   id="editExhibitCoverImage"
+                   accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/tiff">
+
+
+            <label for="editExhibitMedia">
+                Add Media
+            </label>
+
+            <input type="file"
+                   id="editExhibitMedia"
+                   accept="image/*,video/*,audio/*"
+                   multiple>
+
+
+            <label class="checkbox-label">
+
+                <input type="checkbox"
+                       id="editExhibitVisible">
+
+                Visible
+
+            </label>
+
+
+            <button type="submit" class="save-button">
+                Save Changes
+            </button>
+
+            <button type="button"
+                    id="deleteExhibitButton"
+                    class="delete-button">
+                Delete Exhibit
+            </button>
+
+        </form>
+
+        <p id="editExhibitMessage"></p>
+
+    </section>
+
+
+    <!-- EXHIBIT DETAILS -->
+    <section id="exhibitDetailsSection" class="hidden page-section">
+
+        <button id="backToExhibitsButton">
+            Back to Exhibits
+        </button>
+
+        <div id="exhibitDetailsContainer"></div>
+
+        <h2>Media</h2>
+
+        <div id="mediaContainer"></div>
+
+    </section>
+
+
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>

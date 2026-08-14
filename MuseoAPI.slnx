@@ -1,4 +1,9 @@
 <Solution>
+  <Folder Name="/MuseoWeb/">
+    <File Path="MuseoWeb/css/style.css" />
+    <File Path="MuseoWeb/index.html" />
+    <File Path="MuseoWeb/js/app.js" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".env" />
     <File Path=".env.example" />

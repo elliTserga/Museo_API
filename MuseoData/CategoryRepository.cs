@@ -44,25 +44,32 @@ public class CategoryRepository
             commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<bool> UpdateAsync(int id, UpdateCategoryDto dto)
+    public async Task<bool> UpdateAsync(
+        int id,
+        UpdateCategoryDto dto)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
 
-        int rowsAffected = await connection.ExecuteScalarAsync<int>(
-            "sp_UpdateCategory",
-            new
-            {
-                Id = id,
-                dto.Name
-            },
-            commandType: CommandType.StoredProcedure);
+        int rowsAffected =
+            await connection.ExecuteScalarAsync<int>(
+                "sp_UpdateCategory",
+                new
+                {
+                    Id = id,
+                    dto.Name,
+                    dto.ImagePath
+                },
+                commandType: CommandType.StoredProcedure);
 
         return rowsAffected > 0;
     }
 
-    public async Task<int> DeleteAsync(int id, bool force)
+    public async Task<int> DeleteAsync(
+        int id,
+        bool force)
     {
-        using var connection = _dbConnectionFactory.CreateConnection();
+        using var connection =
+            _dbConnectionFactory.CreateConnection();
 
         return await connection.ExecuteScalarAsync<int>(
             "sp_DeleteCategory",

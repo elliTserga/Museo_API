@@ -13,9 +13,12 @@ public class ExhibitDetailsDto
     public int Year { get; set; }
 
     public int? CategoryId { get; set; }
+
     public bool Visible { get; set; }
 
-    public string ImageUrl { get; set; } = string.Empty;
+    public string? ImagePath { get; set; }
+
+    public string? ImageUrl { get; set; }
 
     public List<MediaItem> Media { get; set; } = new();
 }

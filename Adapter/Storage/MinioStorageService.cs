@@ -24,6 +24,27 @@ namespace Adapter.Storage
                 .Build();
         }
 
+        public async Task EnsureBucketExistsAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var bucketExistsArgs = new BucketExistsArgs()
+                .WithBucket(_settings.BucketName);
+
+            bool bucketExists = await _minioClient.BucketExistsAsync(
+                bucketExistsArgs,
+                cancellationToken);
+
+            if (!bucketExists)
+            {
+                var makeBucketArgs = new MakeBucketArgs()
+                    .WithBucket(_settings.BucketName);
+
+                await _minioClient.MakeBucketAsync(
+                    makeBucketArgs,
+                    cancellationToken);
+            }
+        }
+
         public async Task UploadAsync(
             string path,
             Stream stream,
@@ -64,6 +85,27 @@ namespace Adapter.Storage
 
             return await _minioClient.PresignedGetObjectAsync(
                 presignedArgs);
+        }
+
+        public async Task<Stream> GetFileAsync(string path, CancellationToken cancellationToken = default)
+        {
+            var memoryStream = new MemoryStream();
+
+            var getObjectArgs = new GetObjectArgs()
+                .WithBucket(_settings.BucketName)
+                .WithObject(path)
+                .WithCallbackStream(stream =>
+                {
+                    stream.CopyTo(memoryStream);
+                });
+
+            await _minioClient.GetObjectAsync(
+                getObjectArgs,
+                cancellationToken);
+
+            memoryStream.Position = 0;
+
+            return memoryStream;
         }
     }
 }

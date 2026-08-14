@@ -12,7 +12,7 @@
 
         public int? CategoryId { get; set; }
 
-        public string ImageUrl { get; set; } = "";
+        public string? ImagePath { get; set; }
 
         public bool Visible { get; set; }
     }
